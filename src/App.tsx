@@ -5,6 +5,10 @@ import Bowizzy from '@/assets/bowizzy.png';
 import { Box, Crown, FileArchive, LayoutDashboard, Linkedin, LogOut, MessageSquare, Phone, User, Video } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
+import InterviewPrep from './pages/InterviewPrep';
+import InterviewPrepSelection from './pages/(InterviewPrep)/InterviewPrepSelection';
+import MockInterview from './pages/(InterviewPrep)/MockInterview';
+import GiveMockInterview from './pages/(InterviewPrep)/GiveMockInterview';
 const isAuthenticated = () => {
   return true;
 };
@@ -48,7 +52,7 @@ const careerMap = [
     label: 'My resumes',
   },
   {
-    href: '/profile',
+    href: '/interview-prep',
     icon: <Video color="#3B3B3B" size={16} />,
     label: 'Interview Prep',
   },
@@ -189,6 +193,46 @@ function App() {
         <ProtectedRoute>
           <LayoutWrapper>
            <Profile />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "interview-prep",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <InterviewPrep />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "interview-prep/select",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <InterviewPrepSelection />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "interview-prep/mock-interview",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <MockInterview />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "interview-prep/give-mock-interview",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <GiveMockInterview />
           </LayoutWrapper>
         </ProtectedRoute>
       ),
