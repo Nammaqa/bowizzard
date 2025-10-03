@@ -217,7 +217,14 @@ const InterviewPrep = () => {
                               <button className="px-4 py-2 bg-[#4ADE80] text-white rounded-md text-sm font-medium hover:bg-green-500 cursor-pointer whitespace-nowrap">
                                 Join Now
                               </button>
-                              <button className="px-4 py-2 bg-white border border-[#E5E5E5] text-[#3A3A3A] rounded-md text-sm font-medium hover:bg-gray-50 cursor-pointer whitespace-nowrap">
+                              <button
+                                onClick={() =>
+                                  navigate(
+                                    "/interview-prep/interview-details"
+                                  )
+                                }
+                                className="px-4 py-2 bg-white border border-[#E5E5E5] text-[#3A3A3A] rounded-md text-sm font-medium hover:bg-gray-50 cursor-pointer whitespace-nowrap"
+                              >
                                 View Details
                               </button>
                             </>
