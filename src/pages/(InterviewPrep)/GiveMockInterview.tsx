@@ -1,40 +1,58 @@
 import React, { useState } from 'react';
-import { Upload, Check } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import DashNav from '@/components/dashnav/dashnav';
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
-
 const GiveMockInterview = () => {
-
   const navigate = useNavigate();
 
+
   const IntroBanner = () => (
-  <div className="w-full bg-white rounded-[20px] p-5 mb-6">
-    <p className="text-[#3A3A3A] text-sm text-base sm:text-lg leading-relaxed text-center">
-      Gain real interview practice with industry experts. Improve your confidence, sharpen your skills, 
-      and receive valuable feedback.
-    </p>
-  </div>
-);
+    <div className="w-full bg-white rounded-[20px] p-5 mb-6">
+      <p className="text-[#3A3A3A] text-sm text-base sm:text-lg leading-relaxed text-center">
+        Gain real interview practice with industry experts. Improve your confidence, sharpen your skills, 
+        and receive valuable feedback.
+      </p>
+    </div>
+  );
 
 
-  // Screen state: 'form', 'payment', 'success'
   const [currentScreen, setCurrentScreen] = useState('form');
   
-  // Form data state
+
   const [bookingData, setBookingData] = useState({
+    
     role: 'Python Development',
-    selectedDate: { day: 'SAT', date: 23 },
-    selectedTimeSlot: 'MORNING',
-    selectedTime: '10:00 AM',
-    selectedPrimarySkills: ['Skill 1'],
-    selectedSecondarySkills: [],
-    yearsExp: [1, 2],
-    monthsExp: [1, 2, 3],
-    selectedResume: 0,
-    interviewId: null
+    
+    
+    selectedDate: { 
+      day: 'SAT',    
+      date: 23       
+    },
+    selectedTimeSlot: 'MORNING',      
+    selectedTime: '10:00 AM',         
+    
+    
+    selectedPrimarySkills: ['Skill 1'],     
+    selectedSecondarySkills: [],            
+    
+    
+    yearsExp: [1, 2],                       
+    monthsExp: [1, 2, 3],                   
+    
+    
+    selectedResume: 0,                      
+    uploadedResume: null,                   
+    
+    
+    interviewId: null                       
   });
+
+
+  const [uploadedResumeFile, setUploadedResumeFile] = useState(null);
+
+  
 
   const dates = [
     { day: 'SAT', date: 23 },
@@ -46,14 +64,24 @@ const GiveMockInterview = () => {
     { day: 'FRI', date: 29 }
   ];
 
+
   const timeSlots = {
     MORNING: ['10:00 AM', '10:30 AM', '11:00 AM'],
     AFTERNOON: ['11:30 AM', '12:00 PM', '12:30 PM'],
     EVENING: ['12:00 PM', '12:30 PM']
   };
 
-  const primarySkills = ['Skill 1', 'Skill 2', 'Skill 3', 'Skill 4', 'Skill 5', 'Skill 6', 'Skill 7', 'Skill 8'];
-  const secondarySkills = ['Skill 1', 'Skill 2', 'Skill 3', 'Skill 4', 'Skill 5', 'Skill 6', 'Skill 7', 'Skill 8', 'Skill 9', 'Skill 10'];
+
+  const primarySkills = [
+    'Skill 1', 'Skill 2', 'Skill 3', 'Skill 4', 
+    'Skill 5', 'Skill 6', 'Skill 7', 'Skill 8'
+  ];
+  
+  const secondarySkills = [
+    'Skill 1', 'Skill 2', 'Skill 3', 'Skill 4', 'Skill 5', 
+    'Skill 6', 'Skill 7', 'Skill 8', 'Skill 9', 'Skill 10'
+  ];
+
 
   const toggleArrayItem = (array, item) => {
     if (array.includes(item)) {
@@ -62,50 +90,240 @@ const GiveMockInterview = () => {
     return [...array, item];
   };
 
+
+  const validateBookingData = () => {
+    const errors = [];
+
+    if (!bookingData.role) {
+      errors.push('Role is required');
+    }
+
+    if (!bookingData.selectedDate) {
+      errors.push('Date is required');
+    }
+
+    if (!bookingData.selectedTime) {
+      errors.push('Time is required');
+    }
+
+    if (bookingData.selectedPrimarySkills.length === 0) {
+      errors.push('At least one primary skill is required');
+    }
+
+    if (bookingData.yearsExp.length === 0 && bookingData.monthsExp.length === 0) {
+      errors.push('Experience is required');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  };
+
+  const prepareAPIPayload = () => {
+    return {
+      
+      interview: {
+        role: bookingData.role,
+        date: {
+          day: bookingData.selectedDate.day,
+          date: bookingData.selectedDate.date,
+          
+          fullDate: null 
+        },
+        time: {
+          slot: bookingData.selectedTimeSlot,
+          specificTime: bookingData.selectedTime
+        }
+      },
+      
+      
+      skills: {
+        primary: bookingData.selectedPrimarySkills,
+        secondary: bookingData.selectedSecondarySkills
+      },
+      
+      
+      experience: {
+        years: bookingData.yearsExp,
+        months: bookingData.monthsExp,
+        
+        totalMonths: (bookingData.yearsExp.reduce((a, b) => a + b, 0) * 12) + 
+                     bookingData.monthsExp.reduce((a, b) => a + b, 0)
+      },
+      
+      
+      resume: {
+        selectedIndex: bookingData.selectedResume,
+        uploadedFileName: bookingData.uploadedResume,
+        
+        resumeId: null 
+      },
+      
+      
+      payment: {
+        amount: 399.00,
+        currency: 'INR',
+        status: 'pending'
+      },
+      
+      
+      metadata: {
+        timestamp: new Date().toISOString(),
+        timezone: 'IST'
+      }
+    };
+  };
+
+  
   const handleBookInterview = () => {
+    
+    const validation = validateBookingData();
+    
+    if (!validation.isValid) {
+      console.error('Validation Errors:', validation.errors);
+      
+      alert('Please fill in all required fields:\n' + validation.errors.join('\n'));
+      return;
+    }
+
+    
+    const apiPayload = prepareAPIPayload();
+    
+    console.log('='.repeat(80));
+    console.log('BOOKING INTERVIEW - API PAYLOAD');
+    console.log('='.repeat(80));
+    console.log(JSON.stringify(apiPayload, null, 2));
+    console.log('='.repeat(80));
+
     setCurrentScreen('payment');
   };
 
+ 
   const handlePayAndConfirm = () => {
-    // Generate a random interview ID
+    
     const interviewId = Math.floor(100000 + Math.random() * 900000);
+    
+    
+    const confirmationPayload = {
+      ...prepareAPIPayload(),
+      interviewId,
+      payment: {
+        amount: 399.00,
+        currency: 'INR',
+        status: 'completed',
+        transactionId: `TXN${Date.now()}`, 
+        completedAt: new Date().toISOString()
+      }
+    };
+
+    console.log('='.repeat(80));
+    console.log('PAYMENT CONFIRMATION - API PAYLOAD');
+    console.log('='.repeat(80));
+    console.log(JSON.stringify(confirmationPayload, null, 2));
+    console.log('='.repeat(80));
+
     setBookingData({ ...bookingData, interviewId });
     setCurrentScreen('success');
   };
 
+
   const handleCancel = () => {
-    // Reset to initial state or go back
+    console.log('='.repeat(80));
+    console.log('BOOKING CANCELLED');
+    console.log('='.repeat(80));
+
     setCurrentScreen('form');
   };
 
-  // Form Screen
+ 
+  const handleResumeUpload = (event) => {
+    const file = event.target.files[0];
+    
+    if (!file) return;
+
+    
+    const allowedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    
+    if (!allowedTypes.includes(file.type)) {
+      alert('Please upload a PDF, DOC, or DOCX file');
+      return;
+    }
+
+
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+      alert('File size must be less than 5MB');
+      return;
+    }
+
+
+    setUploadedResumeFile(file);
+    setBookingData({
+      ...bookingData,
+      uploadedResume: file.name,
+      selectedResume: 'uploaded' 
+    });
+
+    console.log('='.repeat(80));
+    console.log('RESUME UPLOADED');
+    console.log('='.repeat(80));
+    console.log('File Name:', file.name);
+    console.log('File Size:', (file.size / 1024).toFixed(2), 'KB');
+    console.log('File Type:', file.type);
+    console.log('='.repeat(80));
+
+
+  };
+
+
+  const handleRemoveUploadedResume = () => {
+    setUploadedResumeFile(null);
+    setBookingData({
+      ...bookingData,
+      uploadedResume: null,
+      selectedResume: 0
+    });
+
+    console.log('='.repeat(80));
+    console.log('UPLOADED RESUME REMOVED');
+    console.log('='.repeat(80));
+  };
+
+
   const FormScreen = () => (
     <div className="max-w-[1400px] mx-auto">
       <IntroBanner />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
-        {/* Main Content */}
+        
         <div className="lg:col-span-2 space-y-5">
 
-          {/* Role Selection */}
+
           <div className="bg-white rounded-[20px] py-5 px-5">
             <div className="flex items-center flex-wrap gap-3">
               <span className="text-[#3A3A3A] text-2xl">Role :</span>
               <span className="text-[#3A3A3A] text-2xl flex-1">{bookingData.role}</span>
+              
               <button className="py-2 px-6 rounded-xl border border-[#FF9D48] text-[#FF9D48] text-sm hover:bg-orange-50">
                 Change role
               </button>
+              
               <button className="py-2 px-6 rounded-xl border border-[#FF9D48] text-[#FF9D48] text-sm hover:bg-orange-50">
                 Create new role
               </button>
             </div>
           </div>
 
-          {/* Schedule Section */}
+
           <div className="bg-white rounded-[20px] py-5 px-5">
             <h2 className="text-[#F26D3A] text-2xl mb-5">Schedule your Mock Interview</h2>
             <div className="bg-[#E8E8E8] h-[1px] mb-5"></div>
 
-            {/* Date Selection */}
+            
             <div className="mb-8">
               <div className="flex items-center justify-between mb-6">
                 <span className="text-black text-base font-medium">DATE (IST)</span>
@@ -135,13 +353,14 @@ const GiveMockInterview = () => {
 
             <div className="bg-[#DEDEDE] h-[1px] mb-8"></div>
 
-            {/* Time Selection */}
+            
             <div>
               <div className="flex items-center justify-between mb-6">
                 <span className="text-black text-base font-medium">TIME (IST)</span>
                 <span className="text-black text-[10px]">Note: Each booking is scheduled for 1 hour.</span>
               </div>
 
+              
               <div className="flex gap-5 mb-5">
                 {['MORNING', 'AFTERNOON', 'EVENING'].map((slot) => (
                   <button
@@ -158,6 +377,7 @@ const GiveMockInterview = () => {
                 ))}
               </div>
 
+              
               <div className="flex gap-3 flex-wrap">
                 {timeSlots[bookingData.selectedTimeSlot].map((time) => (
                   <button
@@ -176,15 +396,17 @@ const GiveMockInterview = () => {
             </div>
           </div>
 
-          {/* Skills & Experience */}
+
           <div className="bg-white rounded-[20px] py-5 px-5">
             <h2 className="text-[#3A3A3A] text-xl font-semibold mb-5">SKILL & EXPERIENCE</h2>
 
-            {/* Primary Skills */}
+            
             <div className="mb-6">
               <div className="flex items-start justify-between mb-3 gap-4">
                 <span className="text-[#3A3A3A] text-sm font-medium">PRIMARY SKILLS</span>
-                <span className="text-[10px] text-[#3A3A3A] text-right">Primary skills are taken from your job role. You can select multiple primary skills.</span>
+                <span className="text-[10px] text-[#3A3A3A] text-right">
+                  Primary skills are taken from your job role. You can select multiple primary skills.
+                </span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
                 {primarySkills.map((skill) => (
@@ -206,11 +428,13 @@ const GiveMockInterview = () => {
               </div>
             </div>
 
-            {/* Secondary Skills */}
+            
             <div className="mb-6">
               <div className="flex items-start justify-between mb-3 gap-4">
                 <span className="text-[#3A3A3A] text-sm font-medium">SECONDARY SKILLS</span>
-                <span className="text-[10px] text-[#3A3A3A] text-right">Secondary skills are skills that you think might be asked during your interview.</span>
+                <span className="text-[10px] text-[#3A3A3A] text-right">
+                  Secondary skills are skills that you think might be asked during your interview.
+                </span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
                 {secondarySkills.map((skill) => (
@@ -233,11 +457,11 @@ const GiveMockInterview = () => {
             </div>
           </div>
 
-          {/* Experience */}
+
           <div className="bg-white rounded-[20px] py-5 px-5">
             <h2 className="text-[#3A3A3A] text-xl font-semibold mb-5">EXPERIENCE</h2>
 
-            {/* Years */}
+
             <div className="mb-5">
               <span className="text-[#3A3A3A] text-sm font-medium block mb-3">YEARS</span>
               <div className="flex items-center gap-1 flex-wrap">
@@ -261,7 +485,7 @@ const GiveMockInterview = () => {
               </div>
             </div>
 
-            {/* Months */}
+
             <div>
               <span className="text-[#3A3A3A] text-sm font-medium block mb-3">MONTHS</span>
               <div className="flex items-center gap-1 flex-wrap">
@@ -286,20 +510,21 @@ const GiveMockInterview = () => {
             </div>
           </div>
 
-          {/* Resume */}
+
           <div className="bg-white rounded-[20px] py-5 px-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-[#3A3A3A] text-xl font-semibold">RESUME</h2>
               <span className="text-[10px] text-[#3A3A3A]">Your resume is taken from the Resume Wizard</span>
             </div>
 
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               {[0, 1].map((idx) => (
                 <button
                   key={idx}
-                  onClick={() => setBookingData({ ...bookingData, selectedResume: idx })}
+                  onClick={() => setBookingData({ ...bookingData, selectedResume: idx, uploadedResume: null })}
                   className={`rounded-lg p-3 border-2 ${
-                    bookingData.selectedResume === idx
+                    bookingData.selectedResume === idx && !bookingData.uploadedResume
                       ? 'border-[#F26D3A] bg-[#FFF9F5]'
                       : 'border-[#E5E5E5] bg-white'
                   }`}
@@ -319,18 +544,59 @@ const GiveMockInterview = () => {
               ))}
             </div>
 
+
+            {uploadedResumeFile && (
+              <div className="mb-4 p-4 bg-[#FFF9F5] border-2 border-[#F26D3A] rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#FF9D48] rounded-lg flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-[#3A3A3A]">{uploadedResumeFile.name}</p>
+                      <p className="text-xs text-gray-500">{(uploadedResumeFile.size / 1024).toFixed(2)} KB</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleRemoveUploadedResume}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="text-center mb-3">
               <span className="text-sm text-gray-500">OR</span>
             </div>
 
-            <button className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-600 hover:border-[#FF8351] hover:text-[#FF8351] flex items-center justify-center gap-2 mb-3 cursor-pointer">
+
+            <input
+              type="file"
+              id="resumeUpload"
+              accept=".pdf,.doc,.docx"
+              onChange={handleResumeUpload}
+              className="hidden"
+            />
+
+
+            <label
+              htmlFor="resumeUpload"
+              className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-600 hover:border-[#FF8351] hover:text-[#FF8351] flex items-center justify-center gap-2 mb-3 cursor-pointer transition-colors"
+            >
               <Upload size={16} />
-              Upload Resume
-            </button>
+              Upload Resume (PDF, DOC, DOCX - Max 5MB)
+            </label>
 
             <div className="text-center mb-3">
               <span className="text-sm text-gray-500">OR</span>
             </div>
+
 
             <button className="w-full py-3 border-2 border-gray-300 rounded-lg text-sm text-gray-600 hover:border-[#FF8351] hover:text-[#FF8351] flex items-center justify-center gap-2 cursor-pointer">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -342,7 +608,7 @@ const GiveMockInterview = () => {
             </button>
           </div>
 
-          {/* Action Buttons */}
+
           <div className="flex gap-3">
             <button 
               onClick={handleCancel}
@@ -362,7 +628,6 @@ const GiveMockInterview = () => {
           </div>
         </div>
 
-        {/* Sidebar */}
         <div className="lg:col-span-1">
           <div className="bg-[#FFF9F5] rounded-[20px] p-5 sticky top-6">
             <h3 className="text-[#3A3A3A] text-base font-semibold mb-4">Note</h3>
@@ -390,7 +655,6 @@ const GiveMockInterview = () => {
     </div>
   );
 
-  // Payment Screen
   const PaymentScreen = () => (
     <div className="max-w-[1400px] mx-auto">
       <IntroBanner />
@@ -400,7 +664,6 @@ const GiveMockInterview = () => {
           <div className="bg-white rounded-[20px] py-6 px-6">
             <h2 className="text-[#F26D3A] text-2xl mb-6">Details</h2>
 
-            {/* Date and Time */}
             <div className="grid grid-cols-2 gap-6 mb-6">
               <div>
                 <h3 className="text-[#3A3A3A] text-sm font-semibold mb-2">Date</h3>
@@ -417,7 +680,6 @@ const GiveMockInterview = () => {
               </div>
             </div>
 
-            {/* Role and Experience */}
             <div className="mb-6">
               <h3 className="text-[#F26D3A] text-lg font-semibold mb-1">Role : {bookingData.role}</h3>
               <p className="text-[#3A3A3A] text-sm">
@@ -425,7 +687,7 @@ const GiveMockInterview = () => {
               </p>
             </div>
 
-            {/* Skills Selected */}
+
             <div className="mb-6">
               <h3 className="text-[#3A3A3A] text-base font-semibold mb-3">SKILL(S) SELECTED FOR MOCK INTERVIEW</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
@@ -439,13 +701,13 @@ const GiveMockInterview = () => {
 
             <div className="bg-[#E8E8E8] h-[1px] my-6"></div>
 
-            {/* Amount */}
+
             <div className="flex justify-between items-center mb-6">
               <span className="text-[#3A3A3A] text-lg font-semibold">Amount :</span>
               <span className="text-[#3A3A3A] text-2xl font-bold">₹ 399.00 /-</span>
             </div>
 
-            {/* Pay Button */}
+
             <button
               onClick={handlePayAndConfirm}
               className="w-full py-3 rounded-lg text-base font-semibold text-white cursor-pointer"
@@ -456,16 +718,22 @@ const GiveMockInterview = () => {
               Pay and Confirm
             </button>
 
-            {/* Promotional Sections */}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+
               <div className="bg-[#FFF9E6] rounded-lg p-4">
-                <h4 className="text-[#3A3A3A] font-semibold text-sm mb-2">One IT Community, Endless Opportunities - NamaQA Community</h4>
+                <h4 className="text-[#3A3A3A] font-semibold text-sm mb-2">
+                  One IT Community, Endless Opportunities - NamaQA Community
+                </h4>
                 <button className="mt-2 px-4 py-2 bg-white border border-[#FF9D48] text-[#FF9D48] rounded-lg text-xs font-semibold hover:bg-orange-50">
                   Join Now →
                 </button>
               </div>
+
               <div className="bg-[#F0F9FF] rounded-lg p-4">
-                <h4 className="text-[#3A3A3A] font-semibold text-sm mb-2">Create an ATS-Friendly Resume That Gets Past Filters and Reaches Employers</h4>
+                <h4 className="text-[#3A3A3A] font-semibold text-sm mb-2">
+                  Create an ATS-Friendly Resume That Gets Past Filters and Reaches Employers
+                </h4>
                 <button className="mt-2 px-4 py-2 bg-white border border-[#3B82F6] text-[#3B82F6] rounded-lg text-xs font-semibold hover:bg-blue-50">
                   Create Resume
                 </button>
@@ -474,9 +742,9 @@ const GiveMockInterview = () => {
           </div>
         </div>
 
-        {/* Sidebar */}
+
         <div className="lg:col-span-1">
-          <div className="bg-[#FFF9F5] rounded-[20px] p-6 sticky top-6 ">
+          <div className="bg-[#FFF9F5] rounded-[20px] p-6 sticky top-6">
             <h3 className="text-[#3A3A3A] text-base font-semibold mb-4">Note</h3>
             <ul className="space-y-3 text-xs text-[#3A3A3A] leading-relaxed">
               <li className="flex gap-2">
@@ -502,13 +770,14 @@ const GiveMockInterview = () => {
     </div>
   );
 
-  // Success Screen
+
   const SuccessScreen = () => (
-    <div className="max-w-[1400px] mx-auto ">
+    <div className="max-w-[1400px] mx-auto">
       <IntroBanner />
       <div className="flex items-center justify-center min-h-[50px]">
         <div className="bg-white rounded-[20px] py-12 px-8 text-center max-w w-full">
-          {/* Success Icon */}
+          
+
           <div className="flex justify-center mb-6">
             <motion.div
               className="relative w-24 h-24"
@@ -516,7 +785,7 @@ const GiveMockInterview = () => {
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 12 }}
             >
-              {/* Outer ripple effect */}
+
               <motion.div
                 className="absolute inset-0 rounded-full bg-[#4ADE80] opacity-20"
                 initial={{ scale: 1, opacity: 0 }}
@@ -528,6 +797,7 @@ const GiveMockInterview = () => {
                   ease: "easeOut" 
                 }}
               />
+
               <motion.div
                 className="absolute inset-0 rounded-full bg-[#4ADE80] opacity-20"
                 initial={{ scale: 1, opacity: 0 }}
@@ -541,7 +811,7 @@ const GiveMockInterview = () => {
                 }}
               />
               
-              {/* Main circle with gradient */}
+
               <motion.div
                 className="absolute inset-0 rounded-full flex items-center justify-center"
                 style={{
@@ -557,7 +827,7 @@ const GiveMockInterview = () => {
                   delay: 0.1 
                 }}
               >
-                {/* Checkmark with draw animation */}
+
                 <svg
                   width="48"
                   height="48"
@@ -582,7 +852,7 @@ const GiveMockInterview = () => {
                 </svg>
               </motion.div>
               
-              {/* Sparkle particles */}
+
               {[...Array(6)].map((_, i) => (
                 <motion.div
                   key={i}
@@ -608,7 +878,7 @@ const GiveMockInterview = () => {
             </motion.div>
           </div>
 
-          {/* Success Message */}
+
           <motion.h2 
             className="text-[#3A3A3A] text-3xl font-bold mb-4"
             initial={{ opacity: 0, y: 20 }}
@@ -618,7 +888,7 @@ const GiveMockInterview = () => {
             Mock Interview Booking Confirmed
           </motion.h2>
           
-          {/* Interview ID */}
+
           <motion.p 
             className="text-[#3A3A3A] text-lg mb-8"
             initial={{ opacity: 0, y: 20 }}
@@ -628,7 +898,7 @@ const GiveMockInterview = () => {
             Interview ID: <span className="font-semibold">{bookingData.interviewId}</span>
           </motion.p>
 
-          {/* Additional Info */}
+
           <motion.p 
             className="text-[#3A3A3A] text-sm mb-8 max-w-md mx-auto"
             initial={{ opacity: 0, y: 20 }}
@@ -638,7 +908,7 @@ const GiveMockInterview = () => {
             You will receive a notification 2 hours before your interview and a reminder 30 minutes prior the Mock Interview
           </motion.p>
 
-          {/* Action Button */}
+
           <motion.button
             onClick={() => navigate('/interview-prep')}
             className="py-3 px-8 rounded-lg text-base font-semibold text-white cursor-pointer"
@@ -658,11 +928,15 @@ const GiveMockInterview = () => {
     </div>
   );
 
+
   return (
     <div className="flex flex-col h-screen font-['Baloo_2']">
+
       <DashNav heading="Give Mock Interview" />
 
+
       <div className="flex-1 max-h-screen overflow-auto bg-[#F0F0F0] p-6">
+
         {currentScreen === 'form' && <FormScreen />}
         {currentScreen === 'payment' && <PaymentScreen />}
         {currentScreen === 'success' && <SuccessScreen />}

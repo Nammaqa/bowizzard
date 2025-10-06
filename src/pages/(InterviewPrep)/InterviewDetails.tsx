@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Calendar, Clock, Bookmark } from "lucide-react";
+import { Calendar, Clock, Bookmark, X } from "lucide-react";
 import DashNav from "@/components/dashnav/dashnav";
+import { useNavigate } from "react-router-dom";
 
 // Note Sidebar Component
 const NoteSidebar = ({ notes }) => {
@@ -21,6 +22,8 @@ const NoteSidebar = ({ notes }) => {
 
 const InterviewDetails = () => {
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const navigate = useNavigate();
 
   // Mock data structure - ready for API integration
   const [bookingData, setBookingData] = useState({
@@ -36,6 +39,12 @@ const InterviewDetails = () => {
     resumePages: 2 // Number of pages in resume
   });
 
+  const handleCancelInterview = () => {
+    // Close modal and redirect to interview prep
+    setShowCancelModal(false);
+    navigate('/interview-prep');
+  };
+
   const notes = [
     "The job role and experience for your interview will be based on your profile. To schedule an interview for a different role, please create a new role in your profile section.",
     "Once your payment is complete, your interview request will be forwarded to our professionals, who will conduct the interview according to the available time slots.",
@@ -47,7 +56,78 @@ const InterviewDetails = () => {
     <div className="flex flex-col h-screen bg-[#F0F0F0] font-['Baloo_2']">
       <DashNav heading="Mock Interview Details" />
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
+        {/* Cancel Interview Modal */}
+        {showCancelModal && (
+          <>
+            {/* Backdrop overlay */}
+            <div 
+              className="absolute inset-0 bg-black/20 backdrop-blur-sm z-40"
+              onClick={() => setShowCancelModal(false)}
+            />
+            
+            {/* Modal Container */}
+            <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
+              <div className="flex flex-col bg-white rounded-[20px] w-[502px] h-[502px] shadow-2xl pointer-events-auto">
+                {/* Close button with circle */}
+                <button
+                  onClick={() => setShowCancelModal(false)}
+                  className="self-end mt-5 mr-5 w-8 h-8 rounded-full border-2 border-[#333333] flex items-center justify-center text-[#333333] hover:bg-gray-100 transition-colors cursor-pointer"
+                >
+                  <X size={18} strokeWidth={2.5} />
+                </button>
+
+                {/* Content */}
+                <div className="flex flex-col items-center flex-1 justify-between pb-10">
+                  <div className="flex flex-col items-center">
+                    {/* Warning Icon */}
+                    <div className="w-[151px] h-[151px] mb-[62px] flex items-center justify-center">
+                      <div className="w-[120px] h-[120px] rounded-full flex items-center justify-center relative"
+                        style={{
+                          background: 'linear-gradient(180deg, #FDB854 0%, #F9A825 100%)',
+                          border: '8px solid #E8E8E8'
+                        }}
+                      >
+                        <span className="text-[#666666] text-7xl font-bold leading-none pb-3" style={{ fontFamily: 'Arial, sans-serif' }}>!</span>
+                      </div>
+                    </div>
+
+                    {/* Message */}
+                    <div className="mb-[63px]">
+                      <p className="text-[#3A3A3A] text-2xl text-center whitespace-pre-line">
+                        {"Are you sure you want to cancel this\nMock Interview?"}
+                      </p>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-start gap-[11px]">
+                      <button
+                        onClick={() => setShowCancelModal(false)}
+                        className="py-2 px-[55px] bg-white border border-solid border-[#F26D3A] rounded-xl cursor-pointer"
+                      >
+                        <span className="text-[#F26D3A] text-xl font-bold">
+                          Go Back
+                        </span>
+                      </button>
+                      <button
+                        onClick={handleCancelInterview}
+                        className="py-2 px-4 rounded-xl border-0 cursor-pointer"
+                        style={{
+                          background: "linear-gradient(180deg, #FF9D48, #FF8251)"
+                        }}
+                      >
+                        <span className="text-white text-xl font-bold cursor-pointer">
+                          Cancel Interview
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
         <div className="h-full overflow-auto">
           <div className="max-w-7xl mx-auto p-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -329,10 +409,14 @@ const InterviewDetails = () => {
 
                   {/* Action Buttons */}
                   <div className="flex gap-4 mt-6">
-                    <button className="flex-1 py-3 bg-white border border-[#FFD4D4] text-[#FF6B6B] rounded-lg font-semibold hover:bg-red-50 cursor-pointer">
+                    <button 
+                      onClick={() => setShowCancelModal(true)}
+                      className="flex-1 py-3 bg-white border border-[#FFD4D4] text-[#FF6B6B] rounded-lg font-semibold hover:bg-red-50 cursor-pointer"
+                    >
                       Cancel Interview
                     </button>
                     <button 
+                      onClick={() => navigate('/interview-prep/candidate-information-connect')}
                       className="flex-1 py-3 rounded-lg text-white font-semibold cursor-pointer"
                       style={{
                         background: "linear-gradient(180deg, #FF9D48 0%, #FF8251 100%)",

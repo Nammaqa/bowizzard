@@ -36,6 +36,8 @@ import InterviewPrepSelection from "./pages/(InterviewPrep)/InterviewPrepSelecti
 import MockInterview from "./pages/(InterviewPrep)/MockInterview";
 import GiveMockInterview from "./pages/(InterviewPrep)/GiveMockInterview";
 import InterviewDetails from "./pages/(InterviewPrep)/InterviewDetails";
+import CandidateInformationConnect from "./pages/(InterviewPrep)/CandidateInformationConnect";
+import InterviewerEvaluation from "./pages/(InterviewPrep)/InterviewerEvaluation";
 
 const isAuthenticated = () => {
   return true;
@@ -289,6 +291,26 @@ function App() {
         </ProtectedRoute>
       ),
     },
+    {
+      path: "interview-prep/candidate-information-connect",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <CandidateInformationConnect />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "interview-prep/interviewer-evaluation",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <InterviewerEvaluation />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    }
   ]);
   return <RouterProvider router={router} />;
 }
