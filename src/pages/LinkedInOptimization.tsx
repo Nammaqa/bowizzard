@@ -7,26 +7,20 @@ export default function LinkedInOptimization() {
   const [userProfileUrl, setUserProfileUrl] = useState("");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [browsedFileName, setBrowsedFileName] = useState(
-    <>
-      <Upload /> Browse or Drop LinkedIn profile pdf...
-    </>
+    "Browse or Drop LinkedIn profile pdf..."
   );
 
   const handleFileName = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setResumeFile(file);
-      setBrowsedFileName(<>{file.name}</>);
+      setBrowsedFileName(file.name);
     }
   };
 
   const handleFileDeletion = () => {
     setResumeFile(null);
-    setBrowsedFileName(
-      <>
-        <Upload /> Browse or Drop LinkedIn profile pdf...
-      </>
-    );
+    setBrowsedFileName("Browse or Drop LinkedIn profile pdf...");
   };
 
   {
@@ -34,7 +28,7 @@ export default function LinkedInOptimization() {
   }
   const handlePaste = async () => {
     try {
-      const text = await navigator.clipboard.readText();
+      const text = (await navigator.clipboard.readText()).trim();
       if (text) {
         setUserProfileUrl(text);
       } else {
@@ -43,6 +37,29 @@ export default function LinkedInOptimization() {
     } catch (err) {
       alert("Unable to access clipboard. Please paste manually.");
     }
+  };
+
+  const handleURLSubmit = () => {
+    const LINKEDIN_URL = "https://www.linkedin.com/in/";
+    /* Ensuring the LinkedIn profile URL entered by the user is valid */
+    if (userProfileUrl) {
+      if (
+        userProfileUrl.startsWith(LINKEDIN_URL) &&
+        userProfileUrl.length > LINKEDIN_URL.length
+      )
+        alert("LinkedIn URL submitted successfully!");
+      else alert("Invalid LinkedIn URL! Enter valid one...");
+    } else alert("Please enter the LinkedIn user profile URL!");
+  };
+
+  const handleFileSubmit = () => {
+    const MAX_FILE_SIZE = 2 * 1024 * 1024;
+    /* Ensuring the file uploaded by the user is under 2MB */
+    if (resumeFile) {
+      if (resumeFile.size > MAX_FILE_SIZE)
+        alert("File size exceeds 2MB! Select smaller file...");
+      else alert("File submitted successfully!");
+    } else alert("Please select a file!");
   };
 
   return (
@@ -64,7 +81,7 @@ export default function LinkedInOptimization() {
 
           {/* Toggle button for users to provide the LinkiedIn user profile URL or the resume file PDF */}
           <div className="flex flex-col gap-6 mx-8 text-base">
-            <div className="p-1.5 bg-white rounded-full flex items-center justify-center font-normal shadow-sm">
+            <div className="p-1 bg-white rounded-full flex items-center justify-center font-normal shadow-sm">
               <button
                 className={`px-9 py-2 cursor-pointer flex items-center justify-center gap-1 rounded-full ${
                   isUrlActive === true
@@ -74,9 +91,10 @@ export default function LinkedInOptimization() {
                 aria-label="Paste from clipboard"
                 onClick={() => {
                   setUrlActive(true);
+                  setResumeFile(null);
                 }}
               >
-                <Clipboard />
+                <Clipboard className="size-5" />
                 Paste LinkedIn Profile URL
               </button>
               <button
@@ -88,9 +106,10 @@ export default function LinkedInOptimization() {
                 aria-label="Upload a resume file from the system"
                 onClick={() => {
                   setUrlActive(false);
+                  setUserProfileUrl("");
                 }}
               >
-                <Upload />
+                <Upload className="size-5" />
                 Upload LinkedIn Profile PDF
               </button>
             </div>
@@ -101,7 +120,7 @@ export default function LinkedInOptimization() {
               <div className="flex flex-1 gap-3">
                 <input
                   type="text"
-                  className="bg-white px-5 py-2 w-full flex-1 rounded-xl border-1 border-black outline-none shadow-sm"
+                  className="bg-white px-5 h-12 w-full flex-1 rounded-[10px] border border-black outline-none shadow-sm"
                   placeholder="Paste LinkedIn Profile URL..."
                   value={userProfileUrl}
                   onChange={(e) => {
@@ -111,12 +130,15 @@ export default function LinkedInOptimization() {
 
                 {/* Clipboard button to paste the content from the clipboard */}
                 <div
-                  className="bg-white p-4 rounded-full cursor-pointer shadow-sm"
+                  className="bg-white h-12 w-12 flex justify-center items-center rounded-full cursor-pointer shadow-sm"
                   onClick={handlePaste}
                 >
-                  <Clipboard className="size-6.5" />
+                  <Clipboard className="" />
                 </div>
-                <button className="bg-orange-400 px-5 py-2 rounded-xl text-white shadow-sm">
+                <button
+                  className="bg-orange-400 px-5 h-12 rounded-[10px] text-white shadow-sm cursor-pointer"
+                  onClick={handleURLSubmit}
+                >
                   Submit
                 </button>
               </div>
@@ -124,31 +146,36 @@ export default function LinkedInOptimization() {
             {!isUrlActive && (
               <div className="flex flex-col gap-6.5">
                 <div className="flex gap-3">
-                  <div
-                    className={`bg-white flex-1 px-4 py-2 rounded-xl border-black border-1 shadow-sm ${
-                      resumeFile ? "flex pr-0 pt-0 pb-0" : ""
-                    }`}
-                  >
+                  <div className="bg-white flex flex-1 rounded-[10px] flex-shrink min-w-0 max-w-[478px] h-12 border-black border shadow-sm items-center">
                     <label
                       htmlFor="file-upload"
-                      className={`bg-white px-4 py-2 rounded-xl flex flex-1 justify-center items-center gap-2 cursor-pointer border-0 ${
-                        resumeFile ? "flex-1 text-black" : "text-[gray]"
-                      }`}
+                      className={`bg-white rounded-[10px] px-3 sm:px-5 h-full flex flex-1 justify-center items-center gap-2 cursor-pointer flex-shrink min-w-0
+                      ${resumeFile ? "text-black" : "text-[gray] w-full"}`}
                     >
-                      {browsedFileName}
+                      {!resumeFile ? (
+                        <>
+                          <Upload className="size-5" />
+
+                          <span>Browse or Drop LinkedIn profile pdf...</span>
+                        </>
+                      ) : (
+                        <span className="overflow-hidden whitespace-nowrap text-ellipsis min-w-0 flex-1 block flex-shrink">
+                          {browsedFileName}
+                        </span>
+                      )}
                     </label>
 
                     {/* If the user selects a file from the system the file delete button appears on the right end of the same
                         same file browse button */}
                     {resumeFile && (
                       <button
-                        className="p-4 cursor-pointer rounded-r-xl flex justify-center items-center border-black border-1"
+                        className="px-3 h-12 cursor-pointer rounded-r-xl flex justify-center items-center"
                         aria-label="Remove the browsed resume file"
                         onClick={() => {
                           handleFileDeletion();
                         }}
                       >
-                        <Trash className="text-red-500 size-5.5" />
+                        <Trash className="text-red-500 size-4" />
                       </button>
                     )}
                     <input
@@ -159,20 +186,23 @@ export default function LinkedInOptimization() {
                       accept="application/pdf"
                     />
                   </div>
-                  <button className="bg-orange-400 px-5 py-2 rounded-xl text-white shadow-sm">
+                  <button
+                    className="bg-orange-400 h-12 px-5 rounded-[10px] text-white shadow-sm cursor-pointer"
+                    onClick={handleFileSubmit}
+                  >
                     Submit
                   </button>
                 </div>
 
                 {/* If the user selects the browse file from the system, steps to help the user how to browse the file from 
-                    linkedIn appears, once the user selects the file it dissappears */}
+                    linkedIn appears, once the user selects the file it disappears */}
                 {!resumeFile && (
                   <div className="flex justify-center">
                     <div className="flex flex-col text-sm">
                       <p className="m-[10px] text-center">Steps</p>
-                      <p>Step1: Go to your profile in LinkedIn</p>
-                      <p>Step1: Click "Resources"</p>
-                      <p>Step1: Click on to "Save to PDF"</p>
+                      <p>Step 1: Go to your profile in LinkedIn</p>
+                      <p>Step 2: Click "Resources"</p>
+                      <p>Step 3: Click on to "Save to PDF"</p>
                     </div>
                   </div>
                 )}
