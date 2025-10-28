@@ -38,6 +38,8 @@ import GiveMockInterview from "./pages/(InterviewPrep)/GiveMockInterview";
 import InterviewDetails from "./pages/(InterviewPrep)/InterviewDetails";
 import CandidateInformationConnect from "./pages/(InterviewPrep)/CandidateInformationConnect";
 import InterviewerEvaluation from "./pages/(InterviewPrep)/InterviewerEvaluation";
+import TakeMockInterview from "./pages/(InterviewPrep)/TakeMockInterview";
+
 
 const isAuthenticated = () => {
   return true;
@@ -307,6 +309,16 @@ function App() {
         <ProtectedRoute>
           <LayoutWrapper>
             <InterviewerEvaluation />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "interview-prep/take-mock-interview",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <TakeMockInterview />
           </LayoutWrapper>
         </ProtectedRoute>
       ),

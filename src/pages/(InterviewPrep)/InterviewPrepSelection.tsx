@@ -30,14 +30,7 @@ const InterviewPrepSelection = () => {
         "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=400&h=300&fit=crop",
       route: "/interview-prep/transcript",
     },
-    {
-      title: "Resume",
-      description:
-        "Generate tailored questions based on your resume. Highlight your strengths and experience.",
-      image:
-        "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=300&fit=crop",
-      route: "/interview-prep/resume",
-    },
+    
     {
       title: "Job Role",
       description:
@@ -60,7 +53,7 @@ const InterviewPrepSelection = () => {
           </h2>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-4 gap-3 mb-6">
             {prepOptions.map((option, index) => (
               <div
                 key={index}
