@@ -39,7 +39,7 @@ import InterviewDetails from "./pages/(InterviewPrep)/InterviewDetails";
 import CandidateInformationConnect from "./pages/(InterviewPrep)/CandidateInformationConnect";
 import InterviewerEvaluation from "./pages/(InterviewPrep)/InterviewerEvaluation";
 import TakeMockInterview from "./pages/(InterviewPrep)/TakeMockInterview";
-
+import ProfileForm from "./pages/(Profile)/ProfileForms";
 
 const isAuthenticated = () => {
   return true;
@@ -322,7 +322,17 @@ function App() {
           </LayoutWrapper>
         </ProtectedRoute>
       ),
-    }
+    },
+    {
+      path: "profile/form",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <ProfileForm />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
   ]);
   return <RouterProvider router={router} />;
 }
