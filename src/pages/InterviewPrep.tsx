@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import DashNav from "@/components/dashnav/dashnav";
 import { useNavigate } from "react-router-dom";
@@ -7,7 +7,7 @@ const InterviewPrep = () => {
   const navigate = useNavigate();
 
   // State to hold interview data - set to [] for empty state, or add data to show dashboard
-  const [upcomingInterviews, setUpcomingInterviews] = useState([
+  const [upcomingInterviews] = useState([
     // {
     //   id: 1,
     //   type: "Mock Interview",
@@ -116,7 +116,7 @@ const InterviewPrep = () => {
   ]);
 
   // State to control "see all" expansion
-  const [showAllUpcoming, setShowAllUpcoming] = useState(false);
+  const [showAllUpcoming, setShowAllUpcoming] = useState(true);
   const [showAllPast, setShowAllPast] = useState(false);
 
   // Limit items shown initially
@@ -185,7 +185,7 @@ const InterviewPrep = () => {
               </div>
 
               <div className="space-y-3">
-                {displayedUpcoming.map((interview) => (
+                {displayedUpcoming.map((interview: any) => (
                   <div
                     key={interview.id}
                     className="flex gap-3 p-3 bg-white border border-[#E5E5E5] rounded-xl"
@@ -253,67 +253,67 @@ const InterviewPrep = () => {
             </div>
 
             {/* Interview Stats */}
-            <div className="bg-[#FFF9F5] rounded-2xl p-5">
+            <div className="bg-white rounded-2xl p-5">
               <h2 className="text-[#3A3A3A] text-lg font-semibold mb-4">
                 Interview(s) given till now
               </h2>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 justify-items-stretch">
                 {[
                   {
-                    icon: "👥",
-                    count: "5 sessions",
-                    label: "Mock Sessions",
-                    bg: "bg-[#EDE7F6]",
-                    iconBg: "bg-[#D1C4E9]",
+                  icon: "👥",
+                  count: "Mock Sessions",
+                  label: "5 sessions",
+                  bg: "bg-[#EDE7F6]",
+                  iconBg: "bg-[#D1C4E9]",
                   },
                   {
-                    icon: "🎥",
-                    count: "7 sessions",
-                    label: "Video Practice",
-                    bg: "bg-[#E3F2FD]",
-                    iconBg: "bg-[#BBDEFB]",
+                  icon: "🎥",
+                  count: "Video Practice",
+                  label: "7 sessions",
+                  bg: "bg-[#E3F2FD]",
+                  iconBg: "bg-[#BBDEFB]",
                   },
                   {
-                    icon: "📄",
-                    count: "3 sessions",
-                    label: "Transcript",
-                    bg: "bg-[#FFEBEE]",
-                    iconBg: "bg-[#FFCDD2]",
+                  icon: "📄",
+                  count: "Transcript",
+                  label: "3 sessions",
+                  bg: "bg-[#FFEBEE]",
+                  iconBg: "bg-[#FFCDD2]",
                   },
+                  // {
+                  //   icon: "📋",
+                  //   count: "2 sessions",
+                  //   label: "Resume",
+                  //   bg: "bg-[#E8F5E9]",
+                  //   iconBg: "bg-[#C8E6C9]",
+                  // },
                   {
-                    icon: "📋",
-                    count: "2 sessions",
-                    label: "Resume",
-                    bg: "bg-[#E8F5E9]",
-                    iconBg: "bg-[#C8E6C9]",
-                  },
-                  {
-                    icon: "💼",
-                    count: "4 sessions",
-                    label: "Job Role",
-                    bg: "bg-[#FFF9C4]",
-                    iconBg: "bg-[#FFF59D]",
+                  icon: "💼",
+                  count: "Job Role",
+                  label: "4 sessions",
+                  bg: "bg-[#FFF9C4]",
+                  iconBg: "bg-[#FFF59D]",
                   },
                 ].map((stat, idx) => (
                   <div
-                    key={idx}
-                    className={`${stat.bg} rounded-xl p-3 flex flex-col items-center justify-center min-h-[100px]`}
+                  key={idx}
+                  className={`${stat.bg} rounded-xl p-3 flex flex-col items-center justify-center min-h-[100px] w-full`}
                   >
-                    <div
-                      className={`w-10 h-10 ${stat.iconBg} rounded-full flex items-center justify-center text-xl mb-2`}
-                    >
-                      {stat.icon}
-                    </div>
-                    <p className="text-sm font-bold text-[#3A3A3A] mb-0.5">
-                      {stat.count}
-                    </p>
-                    <p className="text-[10px] text-[#7F7F7F] text-center">
-                      {stat.label}
-                    </p>
+                  <div
+                    className={`w-10 h-10 ${stat.iconBg} rounded-full flex items-center justify-center text-xl mb-2`}
+                  >
+                    {stat.icon}
+                  </div>
+                  <p className="text-sm font-bold text-[#3A3A3A] mb-0.5">
+                    {stat.count}
+                  </p>
+                  <p className="text-[10px] text-[#7F7F7F] text-center">
+                    {stat.label}
+                  </p>
                   </div>
                 ))}
-              </div>
+                </div>
             </div>
 
             {/* Offline Courses Banner */}
@@ -340,7 +340,7 @@ const InterviewPrep = () => {
               </h2>
 
               <div className="space-y-3">
-                {displayedPast.map((interview) => (
+                {displayedPast.map((interview: any) => (
                   <div
                     key={interview.id}
                     className="bg-white border border-[#E5E5E5] rounded-xl overflow-hidden"
