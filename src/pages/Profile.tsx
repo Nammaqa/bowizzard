@@ -7,29 +7,80 @@ export default function Profile() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [activeButton, setActiveButton] = useState("add");
   const [showUploadSection, setShowUploadSection] = useState(false);
+  const [fileError, setFileError] = useState("");
   const navigate = useNavigate();
+
+  // Validation function for file
+  const validateFile = (file) => {
+    const validTypes = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ];
+    const maxSize = 10 * 1024 * 1024; // 10MB
+
+    if (!validTypes.includes(file.type)) {
+      return "Only PDF and Word documents (.doc, .docx) are allowed";
+    }
+
+    if (file.size > maxSize) {
+      return "File size must be less than 10MB";
+    }
+
+    return "";
+  };
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
-    if (
-      file &&
-      (file.type === "application/pdf" ||
-        file.type ===
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-    ) {
+    
+    if (file) {
+      const error = validateFile(file);
+      
+      if (error) {
+        setFileError(error);
+        setSelectedFile(null);
+        return;
+      }
+
       setSelectedFile(file);
+      setFileError("");
       console.log("File selected:", file.name);
     }
+  };
+
+  const handleFileDrop = (event) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    
+    if (file) {
+      const error = validateFile(file);
+      
+      if (error) {
+        setFileError(error);
+        setSelectedFile(null);
+        return;
+      }
+
+      setSelectedFile(file);
+      setFileError("");
+      console.log("File dropped:", file.name);
+    }
+  };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
   };
 
   const handleAddDetailsMyself = () => {
     setActiveButton("add");
     setShowUploadSection(false);
+    setSelectedFile(null);
+    setFileError("");
     console.log("Add details myself clicked");
   };
 
   const handleEnterDataManually = () => {
-    console.log('navigating');
+    console.log("navigating");
     navigate("/profile/form");
   };
 
@@ -42,11 +93,12 @@ export default function Profile() {
     if (selectedFile) {
       console.log("Submitting file:", selectedFile.name);
 
-      // TODO: Add API call here to parse resume
-      // const parsedData = await parseResumeAPI(selectedFile);
+      // Navigate to parsing steps page
+      navigate("/profile/parsing");
 
-      // Navigate to form with parsed data
-      // navigate('/profile/form', { state: { parsedData } });
+      // TODO: In future, add API call here to parse resume
+      // const parsedData = await parseResumeAPI(selectedFile);
+      // Then navigate with: navigate('/profile/parsing', { state: { file: selectedFile } });
     }
   };
 
@@ -133,44 +185,74 @@ export default function Profile() {
                 </div>
               </div>
 
-              {/* Upload Section - Shows when Upload Resume is clicked */}
+              {/* Upload Section */}
               {showUploadSection && (
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full max-w-xl mt-2 px-2 sm:px-0">
-                  <div
-                    onClick={handleBrowseClick}
-                    className="flex-1 border-2 border-gray-300 rounded-2xl px-4 sm:px-6 py-3 flex items-center justify-center gap-2 cursor-pointer hover:bg-gray-50 transition-colors"
-                  >
-                    <Upload
-                      size={16}
-                      className="sm:w-[18px] sm:h-[18px] text-gray-600 flex-shrink-0"
+                <div className="flex flex-col items-center w-full max-w-xl mt-2 px-2 sm:px-0">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
+                    <div
+                      onClick={handleBrowseClick}
+                      onDrop={handleFileDrop}
+                      onDragOver={handleDragOver}
+                      className={`flex-1 border-2 rounded-2xl px-4 sm:px-6 py-3 flex items-center justify-center gap-2 cursor-pointer hover:bg-gray-50 transition-colors ${
+                        fileError
+                          ? "border-red-500 bg-red-50"
+                          : "border-gray-300"
+                      }`}
+                    >
+                      <Upload
+                        size={16}
+                        className={`sm:w-[18px] sm:h-[18px] flex-shrink-0 ${
+                          fileError ? "text-red-600" : "text-gray-600"
+                        }`}
+                      />
+                      <span
+                        className={`text-xs sm:text-sm md:text-[15px] truncate ${
+                          fileError ? "text-red-600" : "text-gray-600"
+                        }`}
+                      >
+                        {selectedFile
+                          ? selectedFile.name
+                          : "Browse or Drop your resume"}
+                      </span>
+                    </div>
+                    <input
+                      id="file-upload-input"
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleFileSelect}
+                      className="hidden"
                     />
-                    <span className="text-gray-600 text-xs sm:text-sm md:text-[15px] truncate">
-                      {selectedFile
-                        ? selectedFile.name
-                        : "Browse or Drop your resume"}
-                    </span>
+                    <button
+                      onClick={handleSubmit}
+                      disabled={!selectedFile}
+                      className={`px-6 sm:px-8 py-3.5 rounded-2xl font-medium text-sm sm:text-[15px] transition-colors duration-300 shadow-sm cursor-pointer ${
+                        selectedFile
+                          ? "bg-orange-400 hover:bg-orange-500 text-white"
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      }`}
+                    >
+                      Submit
+                    </button>
                   </div>
-                  <input
-                    id="file-upload-input"
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-                  <button
-                    onClick={handleSubmit}
-                    className="px-6 sm:px-8 py-3.5 bg-orange-400 hover:bg-orange-500 text-white rounded-2xl font-medium text-sm sm:text-[15px] transition-colors duration-300 shadow-sm cursor-pointer"
-                  >
-                    Submit
-                  </button>
+                  
+                  {/* Error Message */}
+                  {fileError && (
+                    <p className="mt-2 text-xs sm:text-sm text-red-500 text-center">
+                      {fileError}
+                    </p>
+                  )}
                 </div>
               )}
 
-              {/* Enter Data Manually Button - Shows only when Add Details Myself is active */}
+              {/* Enter Data Manually Button */}
               {activeButton === "add" && (
                 <button
                   onClick={handleEnterDataManually}
-                  className="mt-2 px-6 sm:px-8 py-3.5 bg-orange-400 hover:bg-orange-500 text-white rounded-2xl font-medium text-sm sm:text-[15px] transition-colors duration-300 shadow-sm cursor-pointer"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, #FF9D48 0%, #FF8251 100%)",
+                  }}
+                  className="mt-2 px-6 sm:px-8 py-3.5 text-white rounded-2xl font-medium text-sm sm:text-[15px] transition-all duration-300 shadow-sm cursor-pointer hover:opacity-90"
                 >
                   Enter Data Manually
                 </button>
