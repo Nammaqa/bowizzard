@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
+import LinkedInOptimization from "./pages/LinkedInOptimization";
 import InterviewPrep from "./pages/InterviewPrep";
 import InterviewPrepSelection from "./pages/(InterviewPrep)/InterviewPrepSelection";
 import MockInterview from "./pages/(InterviewPrep)/MockInterview";
@@ -87,6 +88,7 @@ const careerMap = [
     label: "My resumes",
   },
   {
+    href: "/profile",
     href: "/interview-prep",
     icon: <Video color="#3B3B3B" size={16} />,
     label: "Interview Prep",
@@ -245,6 +247,14 @@ function App() {
           </LayoutWrapper>
         </ProtectedRoute>
       ),
+      
+    },
+    {
+      path: "linkedin-optimization",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <LinkedInOptimization />
     },
     {
       path: "interview-prep",
@@ -345,7 +355,7 @@ function App() {
           </LayoutWrapper>
         </ProtectedRoute>
       ),
-    }
+    },
   ]);
   return <RouterProvider router={router} />;
 }
