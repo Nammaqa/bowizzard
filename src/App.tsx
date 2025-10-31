@@ -88,7 +88,6 @@ const careerMap = [
     label: "My resumes",
   },
   {
-    href: "/profile",
     href: "/interview-prep",
     icon: <Video color="#3B3B3B" size={16} />,
     label: "Interview Prep",
@@ -99,7 +98,7 @@ const careerMap = [
     label: "Career guidance",
   },
   {
-    href: "/profile",
+    href: "/linkedin-optimization",
     icon: <Linkedin color="#3B3B3B" size={16} />,
     label: "LinkedIn optimization",
   },
@@ -247,7 +246,7 @@ function App() {
           </LayoutWrapper>
         </ProtectedRoute>
       ),
-      
+
     },
     {
       path: "linkedin-optimization",
@@ -255,6 +254,9 @@ function App() {
         <ProtectedRoute>
           <LayoutWrapper>
             <LinkedInOptimization />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
     },
     {
       path: "interview-prep",
