@@ -32,6 +32,19 @@ import {
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import LinkedInOptimization from "./pages/LinkedInOptimization";
+import InterviewPrep from "./pages/InterviewPrep";
+import InterviewPrepSelection from "./pages/(InterviewPrep)/InterviewPrepSelection";
+import MockInterview from "./pages/(InterviewPrep)/MockInterview";
+import GiveMockInterview from "./pages/(InterviewPrep)/GiveMockInterview";
+import InterviewDetails from "./pages/(InterviewPrep)/InterviewDetails";
+import CandidateInformationConnect from "./pages/(InterviewPrep)/CandidateInformationConnect";
+import InterviewerEvaluation from "./pages/(InterviewPrep)/InterviewerEvaluation";
+import TakeMockInterview from "./pages/(InterviewPrep)/TakeMockInterview";
+import ProfileForm from "./pages/(Profile)/ProfileForms";
+import ParsingSteps from "./pages/(Profile)/components/ParsingSteps";
+
+
+
 const isAuthenticated = () => {
   return true;
 };
@@ -76,6 +89,7 @@ const careerMap = [
   },
   {
     href: "/profile",
+    href: "/interview-prep",
     icon: <Video color="#3B3B3B" size={16} />,
     label: "Interview Prep",
   },
@@ -241,6 +255,103 @@ function App() {
         <ProtectedRoute>
           <LayoutWrapper>
             <LinkedInOptimization />
+    },
+    {
+      path: "interview-prep",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <InterviewPrep />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "interview-prep/select",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <InterviewPrepSelection />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "interview-prep/mock-interview",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <MockInterview />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "interview-prep/give-mock-interview",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <GiveMockInterview />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "interview-prep/interview-details",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <InterviewDetails />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "interview-prep/candidate-information-connect",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <CandidateInformationConnect />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "interview-prep/interviewer-evaluation",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <InterviewerEvaluation />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "interview-prep/take-mock-interview",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <TakeMockInterview />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "profile/form",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <ProfileForm />
+          </LayoutWrapper>
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "profile/parsing",
+      Component: () => (
+        <ProtectedRoute>
+          <LayoutWrapper>
+            <ParsingSteps />
           </LayoutWrapper>
         </ProtectedRoute>
       ),
