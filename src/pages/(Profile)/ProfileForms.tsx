@@ -1,9 +1,13 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import DashNav from "@/components/dashnav/dashnav";
 import ProfileStepper from "./components/ProfileStepper";
 import PersonalDetailsForm from "./components/PersonalDetailsForm";
 import EducationDetailsForm from "./components/EducationDetailsForm";
+import ExperienceDetailsForm from "./components/ExperienceDetailsForm";
+import ProjectDetailsForm from "./components/ProjectDetailsForm";
+import SkillsLinksDetailsForm from "./components/SkillsLinksDetailsForm";
+import CertificationDetailsForm from "./components/CertificationDetailsForm";
 
 export default function ProfileForm() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -15,7 +19,12 @@ export default function ProfileForm() {
     skills: {},
     certification: {},
   });
+  const [validationErrors, setValidationErrors] = useState<{
+    [key: string]: boolean;
+  }>({});
+  
   const location = useLocation();
+  const navigate = useNavigate();
   const parsedData = location.state?.parsedData;
 
   const steps = [
@@ -27,6 +36,80 @@ export default function ProfileForm() {
     "Certification",
   ];
 
+  // Validation function to check if step has any validation errors
+  const validateStepData = (stepIndex: number, data: any): boolean => {
+    const stepKeys = [
+      "personal",
+      "education",
+      "experience",
+      "projects",
+      "skills",
+      "certification",
+    ];
+    
+    // Basic validation - check if data exists
+    if (!data || Object.keys(data).length === 0) {
+      return false;
+    }
+
+    // Step-specific validation
+    switch (stepIndex) {
+      case 0: // Personal Details
+        // Check if required fields have values
+        if (!data.firstName || !data.lastName) {
+          return false;
+        }
+        // Check email format
+        if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+          return false;
+        }
+        // Check phone format (if provided)
+        if (data.phoneNumber && !/^[0-9]{10,15}$/.test(data.phoneNumber.replace(/[\s-]/g, ''))) {
+          return false;
+        }
+        break;
+
+      case 1: // Education Details
+        // Check if at least one education entry exists with required fields
+        if (data.educationDetails && Array.isArray(data.educationDetails)) {
+          const hasValidEducation = data.educationDetails.some(
+            (edu: any) => edu.institutionName && edu.degree
+          );
+          if (!hasValidEducation) {
+            return false;
+          }
+        }
+        break;
+
+      case 2: // Experience Details
+        // Check if job role is selected
+        if (!data.jobRole) {
+          return false;
+        }
+        break;
+
+      case 3: // Projects
+        // Projects are optional, so always return true
+        break;
+
+      case 4: // Skills & Links
+        // Check if at least one skill exists
+        if (data.skills && Array.isArray(data.skills)) {
+          const hasValidSkill = data.skills.some((skill: any) => skill.skillName);
+          if (!hasValidSkill) {
+            return false;
+          }
+        }
+        break;
+
+      case 5: // Certification
+        // Certifications are optional, so always return true
+        break;
+    }
+
+    return true;
+  };
+
   const handleNext = (data: any) => {
     // Update form data for current step
     const stepKeys = [
@@ -37,20 +120,59 @@ export default function ProfileForm() {
       "skills",
       "certification",
     ];
-    setFormData((prev) => ({
-      ...prev,
+    
+    const updatedFormData = {
+      ...formData,
       [stepKeys[currentStep]]: data,
+    };
+    
+    setFormData(updatedFormData);
+
+    // Validate the current step data
+    const isValid = validateStepData(currentStep, data);
+    setValidationErrors((prev) => ({
+      ...prev,
+      [stepKeys[currentStep]]: !isValid,
     }));
 
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Final submission - prepare for API integration
-      console.log("Final form data:", formData);
+      // Final submission - validate all steps
+      let hasErrors = false;
+      const allErrors: { [key: string]: boolean } = {};
+
+      stepKeys.forEach((key, index) => {
+        const stepData = index === currentStep ? data : formData[key as keyof typeof formData];
+        const isStepValid = validateStepData(index, stepData);
+        if (!isStepValid) {
+          hasErrors = true;
+          allErrors[key] = true;
+        }
+      });
+
+      if (hasErrors) {
+        setValidationErrors(allErrors);
+        console.log("Validation errors found. Please complete all required fields.");
+        // Optionally, scroll to first error or show a message
+        return;
+      }
+
+      // All validation passed - prepare for API integration
+      console.log("Final form data:", updatedFormData);
+      
       // TODO: API call will go here
+      // Example:
+      // try {
+      //   const response = await submitProfileData(updatedFormData);
+      //   if (response.success) {
+      //     navigate('/dashboard');
+      //   }
+      // } catch (error) {
+      //   console.error('Submission error:', error);
+      // }
     }
   };
-
 
   const handleBack = () => {
     if (currentStep > 0) {
@@ -59,6 +181,7 @@ export default function ProfileForm() {
   };
 
   const handleStepClick = (stepIndex: number) => {
+    // Allow navigation to any step (user can review/edit previous steps)
     setCurrentStep(stepIndex);
   };
 
@@ -73,7 +196,6 @@ export default function ProfileForm() {
           />
         );
       case 1:
-        // TODO: Education form component
         return (
           <EducationDetailsForm
             onNext={handleNext}
@@ -82,28 +204,36 @@ export default function ProfileForm() {
           />
         );
       case 2:
-        // TODO: Experience form component
         return (
-          <div className="text-center py-8">Experience Form - Coming Soon</div>
+          <ExperienceDetailsForm
+            onNext={handleNext}
+            onBack={handleBack}
+            initialData={formData.experience}
+          />
         );
       case 3:
-        // TODO: Projects form component
         return (
-          <div className="text-center py-8">Projects Form - Coming Soon</div>
+          <ProjectDetailsForm
+            onNext={handleNext}
+            onBack={handleBack}
+            initialData={formData.projects}
+          />
         );
       case 4:
-        // TODO: Skills & Links form component
         return (
-          <div className="text-center py-8">
-            Skills & Links Form - Coming Soon
-          </div>
+          <SkillsLinksDetailsForm
+            onNext={handleNext}
+            onBack={handleBack}
+            initialData={formData.skills}
+          />
         );
       case 5:
-        // TODO: Certification form component
         return (
-          <div className="text-center py-8">
-            Certification Form - Coming Soon
-          </div>
+          <CertificationDetailsForm
+            onNext={handleNext}
+            onBack={handleBack}
+            initialData={formData.certification}
+          />
         );
       default:
         return null;
